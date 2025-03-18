@@ -16,12 +16,12 @@ struct Cli {
     context: usize,
 }
 
-fn generate_diff(old: &str, new: &str, context_lines: usize) -> String {
+fn generate_diff(old: &str, new: &str, context_lines: usize, file_path: &str) -> String {
     let diff = TextDiff::from_lines(old, new);
     let mut result = String::new();
 
-    result.push_str("--- a/\n");
-    result.push_str("+++ b/\n");
+    result.push_str(&format!("--- a/{}\n", file_path));
+    result.push_str(&format!("+++ b/{}\n", file_path));
 
     for op in group_diff_ops(diff.ops().to_vec(), context_lines) {
         let first_op = &op[0];
@@ -98,13 +98,10 @@ fn main() -> io::Result<()> {
     let mut new_content = String::new();
     io::stdin().read_to_string(&mut new_content)?;
 
-    let diff_output = generate_diff(&old_content, &new_content, args.context);
+    let file_path = args.file.display().to_string();
+    let diff_output = generate_diff(&old_content, &new_content, args.context, &file_path);
 
-    let diff_with_paths = diff_output
-        .replace("--- a/\n", &format!("--- a/{}\n", args.file.display()))
-        .replace("+++ b/\n", &format!("+++ b/{}\n", args.file.display()));
-
-    for line in diff_with_paths.lines() {
+    for line in diff_output.lines() {
         if line.starts_with('-') {
             print!("{}", Red.paint(line));
             println!();
