@@ -1,0 +1,9 @@
+[package]
+name = "diffwrite"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.32", features = ["derive"] }
+similar = "2.4.0"
+ansi_term = "0.12.1"
